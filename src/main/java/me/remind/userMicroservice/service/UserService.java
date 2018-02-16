@@ -10,9 +10,9 @@ import me.remind.userMicroservice.model.User;
 @Repository
 public interface UserService  {
 
-	public List<User> findAll();
+	public List<User> findAllUser();
 
-	public User findById(Long id);
+	public User findUserById(Long id);
 
 	public void deleteUserById(Long id);
 
@@ -21,5 +21,7 @@ public interface UserService  {
 	public boolean userExist(User user);
 
 	public void createUser(User user);
+
+	public void updateUser(User user);
 
 }

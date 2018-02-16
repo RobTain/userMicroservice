@@ -29,57 +29,65 @@ public class UserController {
 	public final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
-	 * List all users from DB
+	 * List all user entities
 	 * 
 	 * @return all users
 	 */
 	@RequestMapping(value = { "/users", "/users/" }, method = RequestMethod.GET)
-	public ResponseEntity<List<User>> findAll() {
-		List<User> users = userService.findAll();
+	public ResponseEntity<List<User>> findAllUser() {
+		// fetch all users and return list
+		List<User> users = userService.findAllUser();
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
 
 	/**
-	 * Searches user DB for the user with @param id
+	 * Searches for the user entity with @param id
 	 * 
-	 * @param id
-	 *            the id to be searched for
+	 * @param id the id to be searched for
 	 * @return user with the id or an HTTP 404
 	 */
 	@RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-	public ResponseEntity<User> findById(@PathVariable("id") Long id) {
-		User user = userService.findById(id);
+	public ResponseEntity<User> findUserById(@PathVariable("id") Long id) {
+		// fetch certain user
+		User user = userService.findUserById(id);
+		
+		// check valid user
 		if (user == null) {
 			logger.error("User with id {} not found", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
+			// return user
 			return new ResponseEntity<User>(user, HttpStatus.OK);
 		}
 	}
 
 	/**
-	 * Delete requested user with @param id
+	 * Delete requested user entity with @param id
 	 * 
-	 * @param id
-	 *            the id to be searched for
+	 * @param id the id to be searched for
 	 * @return HTTP 204 (user deleted) or HTTP 404 (user not found)
 	 */
 	@RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
 		logger.info("Fetching & Deleting User with id {}", id);
 
-		User user = userService.findById(id);
+		// fetch certain user
+		User user = userService.findUserById(id);
+		
+		// check valid user
 		if (user == null) {
-			logger.error("Unable to delete user with id {} -> user not found", id);
+			logger.error("Unable to delete user with id {}. User not found", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
+			
+			// delete user
 			userService.deleteUserById(id);
 			return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
 		}
 	}
 
 	/**
-	 * Delete all users from db
+	 * Delete all user entities from DB
 	 * 
 	 * @return HTTP 204 (all users deleted)
 	 */
@@ -91,24 +99,66 @@ public class UserController {
 	}
 
 	/**
-	 * $ curl -H "Content-Type: application/json" -X POST -d '{"forename": "Max",
-    "surname": "Mustermann",
-    "position": "Janitor",
-    "link": "https://github.com/RobTain"}' localhost:8080/users/
-
+	 * Create a new user entity
+	 * 
+	 * @param user the user to be added into DB
+	 * @return HTTP 409 (user exist) or HTTP 201 (user created)
 	 */
 	@RequestMapping(value = "/users/", method = RequestMethod.POST, consumes =  MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
+	public ResponseEntity<?> createUser(@RequestBody User user) {
 		logger.info("Creating User : {}", user);
+		
+		// check valid input
 		if (userService.userExist(user)) {
 			logger.error("Unable to create user. User already exist!");
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} else {
 			userService.createUser(user);
-			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(user.getId()).toUri());
-			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+			return new ResponseEntity<>(HttpStatus.CREATED);
 		}
 	}
-
+	
+	/**
+	 * Edit a user entity
+	 * @param id the id to be searched for
+	 * @param user the user to be modified and written into DB
+	 * @return HTTP 200 (user updated) or HTTP 404 (User not found)
+	 */
+	 @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT, consumes =  MediaType.APPLICATION_JSON_VALUE)
+	    public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user) {
+	        logger.info("Updating User with id {}", id);
+	 
+	        // find user
+	        User currentUser = userService.findUserById(id);
+	 
+	        // check valid user
+	        if (user == null) {
+				logger.error("Unable to update user with id {}. User not found", id);
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	        } else {
+	        	// update input
+	        	if (!user.getForename().equals(null)) {
+	        		currentUser.setForename(user.getForename());
+	        	}
+	        	if (!user.getSurname().equals(null)) {
+	        		currentUser.setSurname(user.getSurname());
+	        	}
+	        	if (!user.getPosition().equals(null)) {
+	        		currentUser.setPosition(user.getPosition());
+	        	}
+	        	if (!user.getLink().equals(null)) {
+	        		currentUser.setLink(user.getLink());
+	        	}
+	        }
+	        
+	        // check valid input
+			if (userService.userExist(currentUser)) {
+				logger.error("Unable to update user. User already exist!");
+				return new ResponseEntity<>(HttpStatus.CONFLICT);
+			} else {
+				  // update user into DB
+		        userService.updateUser(currentUser);
+		        return new ResponseEntity<>(HttpStatus.OK);
+			}
+		}
 }
