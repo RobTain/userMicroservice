@@ -1,10 +1,7 @@
 package me.remind.userMicroservice.service;
 
 import java.util.List;
-
-
 import org.springframework.stereotype.Repository;
-
 import me.remind.userMicroservice.model.User;
 
 @Repository
@@ -23,5 +20,7 @@ public interface UserService  {
 	public void createUser(User user);
 
 	public void updateUser(User user);
+
+	public String findExternalResources(String link);
 
 }
