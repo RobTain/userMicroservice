@@ -52,9 +52,9 @@ http://localhost:8080/users/x
 
 ## access data returned from Github:
 
-**show Github-Repositories and coding language from a certain user:**
+**show Github-Repositories and coding language from a certain user with id x:**
 
-http://localhost:8080/users/id/repositories
+http://localhost:8080/users/x/repositories
 
 
 ## tests:
