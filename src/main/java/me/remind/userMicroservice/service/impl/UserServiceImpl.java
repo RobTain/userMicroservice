@@ -12,7 +12,11 @@ import me.remind.userMicroservice.model.User;
 import me.remind.userMicroservice.service.UserService;
 import static java.util.Arrays.asList;
 
-
+/**
+ * Managed communication between DB/external URLs and this Application. (DAO)
+ * 
+ * @author RobSoft
+ */
 @Service
 public class UserServiceImpl implements UserService {
 

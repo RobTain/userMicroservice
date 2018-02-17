@@ -17,6 +17,11 @@ import me.remind.userMicroservice.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * RESTful web service controller for Request/Response communication with clients.
+ * 
+ * @author RobSoft
+ */
 @RestController
 public class UserController {
 
@@ -51,7 +56,7 @@ public class UserController {
 
 		// check not existing user
 		if (user == null) {
-			logger.error("User with id {} not found", id);
+			logger.error("User with id {} not found.", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			// return user
@@ -74,7 +79,7 @@ public class UserController {
 
 		// check not existing user
 		if (user == null) {
-			logger.error("Unable to delete user with id {}. User is already deleted", id);
+			logger.error("Unable to delete user with id {}.", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			
@@ -106,7 +111,7 @@ public class UserController {
 	@RequestMapping(value = "/users/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createUser(@RequestBody User user) {
 		logger.info("Creating User : {}", user);
-
+		
 		// check valid input
 		if (userService.userExist(user)) {
 			logger.error("Unable to create user. User already exist!");
@@ -136,7 +141,7 @@ public class UserController {
 		
 		// check not existing user
 		if (currentUser == null) {
-			logger.error("Unable to update user with id {}. User is deleted", id);
+			logger.error("Unable to update user with id {}.", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			// update input

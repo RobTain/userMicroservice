@@ -3,10 +3,7 @@ package me.remind.userMicroservice;
 import org.junit.runners.MethodSorters;
 import org.junit.FixMethodOrder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.not;
 import static org.junit.Assert.assertEquals;
-
-import org.h2.engine.SysProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -20,8 +17,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import me.remind.userMicroservice.model.User;
 
 /**
@@ -428,7 +423,7 @@ public class UserMicroserviceApplicationTests {
 	 * Expected HTTP Header: 404 (Not Found)
 	 */
 	@Test
-	public void test12_updateDeletedUser() {
+	public void test13_updateDeletedUser() {
 		logger.info("TEST> Update a deleted user!");
 	
 		// set user
@@ -457,7 +452,7 @@ public class UserMicroserviceApplicationTests {
 	 * Expected HTTP Header: 404 (Not Found)
 	 */
 	@Test
-	public void test12_updateNonExistingUser() {
+	public void test14_updateNonExistingUser() {
 		logger.info("TEST> Update a not existing user!");
 	
 		// set user
@@ -479,6 +474,90 @@ public class UserMicroserviceApplicationTests {
 		assertEquals(expectedHeader, response.getStatusCodeValue());
 	}
 	
+	
+	/**
+	 * Delete existing user (Max Mustermann with id = 2)
+	 * 
+	 * Expected HTTP Header: 204 (No Content) 
+	 * Expected String representation: []
+	 */
+	@Test
+	public void test15_deleteAllUser() {
+		logger.info("TEST> Delete all user!");
+
+		// build web call
+		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.DELETE, 
+				entity, String.class);
+		
+		// test
+		int expectedHeader = 204;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+
+		// check String representation
+		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
+		
+		// test
+		String expectedStringRepresentation = "[]";
+		assertThat(!response.getBody().contains(expectedStringRepresentation));
+	}
+	
+	/**
+	 * Check external Github information from a not existing user
+	 * 
+	 * Expected HTTP Header: 404 (No Content) 
+	 */
+	@Test
+	public void test16_getGitHubInformationFromNotValidUser() {
+		logger.info("TEST> Check external Github information from a not existing user!");
+
+		// build web call
+		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/repositories", 
+				HttpMethod.GET, entity, String.class);
+
+		// tests
+		int expectedHeader = 404;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+	}
+	
+	/**
+	 * Check external Github information from an existing user
+	 * 
+	 * Expected HTTP Header: 200 (OK) 
+	 * Expected String representation: contains(this.Application.name)
+	 */
+	@Test
+	public void test17_getGitHubInformationFromValidUser() {
+		logger.info("TEST> Check external Github information from an existing user!");
+		
+		// create user
+		User user = new User();
+		user.setForename("Robert");
+		user.setSurname("Koenig");
+		user.setPosition("Java Developer");
+		user.setLink("https://github.com/RobTain");
+
+		// build web call
+		HttpEntity<User> entity = new HttpEntity<>(user, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.POST, entity, String.class);
+		
+		// call external site
+		response = restTemplate.exchange(localhostLink() + "/5/repositories" , HttpMethod.GET, entity, String.class);
+
+		// tests
+		int expectedHeader = 200;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+		
+		String expectedStringRepresentation = "userMicroservice";
+		assertThat(response.getBody()).contains(expectedStringRepresentation);		
+	}
 	
 	private String localhostLink() {
 		return "http://localhost:" + port + "/users/";
