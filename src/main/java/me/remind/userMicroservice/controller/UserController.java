@@ -23,7 +23,7 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	public final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * List all user entities
@@ -132,23 +132,23 @@ public class UserController {
 
 		// find user
 		User currentUser = userService.findUserById(id);
-
+		
 		// check valid user
 		if (user == null) {
 			logger.error("Unable to update user with id {}. User not found", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			// update input
-			if (!user.getForename().equals(null)) {
+			if (!(user.getForename() == null)) {
 				currentUser.setForename(user.getForename());
 			}
-			if (!user.getSurname().equals(null)) {
+			if (!(user.getSurname() == null)) {
 				currentUser.setSurname(user.getSurname());
 			}
-			if (!user.getPosition().equals(null)) {
+			if (!(user.getPosition() == null)) {
 				currentUser.setPosition(user.getPosition());
 			}
-			if (!user.getLink().equals(null)) {
+			if (!(user.getLink() == null)) {
 				currentUser.setLink(user.getLink());
 			}
 		}
