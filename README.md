@@ -59,6 +59,20 @@ http://localhost:8080/users/x/repositories
 
 ## tests:
 
-**checkInitialState():**
-check for correct initialization of the spring boot application
-
+**test01_checkInitialState():**
+**test02_createValidUser()**
+**test03_createDublicate()**
+**test04_createDublicateExceptLinkValue()**
+**test05_createNewUserWithExistingLink()**
+**test06_createUserWithMissingInputs()**
+**test07_createMultipleUsers()**
+**test08_deleteValidUser()**
+**test09_deleteDeletedUser()**
+**test10_deleteNotValidUser()**
+**test11_updateValidUser()**
+**test12_updateDublicate()**
+**test13_updateDeletedUser()**
+**test14_updateNonExistingUser()**
+**test15_deleteAllUser()**
+**test16_getGitHubInformationFromNotValidUser()**
+**test17_getGitHubInformationFromValidUser()**

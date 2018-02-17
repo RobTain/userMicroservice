@@ -144,7 +144,7 @@ public class UserMicroserviceApplicationTests {
 	 * Expected HTTP Header 409 (Conflict)
 	 */
 	@Test
-	public void test04_createSameUserWithExistingData() {
+	public void test04_createDublicateExceptLinkValue() {
 		logger.info("TEST> Create a new user with same input except the link!");
 		// create user
 		User user = new User();
