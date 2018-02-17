@@ -41,10 +41,7 @@ $ curl -X DELETE http://localhost:8080/users/x
 $ curl -H "Content-Type: application/json" -X POST -d '{"forename": "forename", "surname": "surname", "position": "position", "link": "https://github.com/x"}' http://localhost:8080/users/
     
 **update user with certain id x:** 
-$ curl -H 'Content-Type: application/json' -X PUT -d 
-'{"forename":"forename","surname":"surname","position":"position",
-"link":"https://github.com/x"}' 
-http://localhost:8080/users/x
+$ curl -H 'Content-Type: application/json' -X PUT -d '{"forename":"forename","surname":"surname","position":"position","link":"https://github.com/x"}' http://localhost:8080/users/x
 
 
 ## access data returned from Github:
