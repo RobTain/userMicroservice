@@ -59,5 +59,6 @@ http://localhost:8080/users/x/repositories
 
 ## tests:
 
-missing tests!
+**checkInitialState():**
+check for correct initialization of the spring boot application
 
