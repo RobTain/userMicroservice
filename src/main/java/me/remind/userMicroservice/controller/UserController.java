@@ -24,7 +24,7 @@ public class UserController {
 	private UserService userService;
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+	
 	/**
 	 * List all user entities
 	 * 
@@ -45,17 +45,18 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
 	public ResponseEntity<User> findUserById(@PathVariable("id") Long id) {
+		
 		// fetch certain user
 		User user = userService.findUserById(id);
 
-		// check valid user
+		// check not existing user
 		if (user == null) {
 			logger.error("User with id {} not found", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			// return user
 			return new ResponseEntity<User>(user, HttpStatus.OK);
-		}
+		}		
 	}
 
 	/**
@@ -71,9 +72,9 @@ public class UserController {
 		// fetch certain user
 		User user = userService.findUserById(id);
 
-		// check valid user
+		// check not existing user
 		if (user == null) {
-			logger.error("Unable to delete user with id {}. User not found", id);
+			logger.error("Unable to delete user with id {}. User is already deleted", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			
@@ -129,13 +130,13 @@ public class UserController {
 	@RequestMapping(value = "/users/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user) {
 		logger.info("Updating User with id {}", id);
-
+		
 		// find user
 		User currentUser = userService.findUserById(id);
 		
-		// check valid user
-		if (user == null) {
-			logger.error("Unable to update user with id {}. User not found", id);
+		// check not existing user
+		if (currentUser == null) {
+			logger.error("Unable to update user with id {}. User is deleted", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			// update input
@@ -173,10 +174,11 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/users/{id}/repositories", method = RequestMethod.GET)
 	public ResponseEntity<String> findRepositoriesFromUserId(@PathVariable("id") Long id) {
+				
 		// fetch certain user
 		User user = userService.findUserById(id);
 
-		// check valid user
+		// check not existing user
 		if (user == null) {
 			logger.error("User with id {} not found", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -193,9 +195,4 @@ public class UserController {
 			}
 		}
 	}
-	
-	public void test() {
-		System.out.println("Ich bin ein berliner");
-	}
-
 }

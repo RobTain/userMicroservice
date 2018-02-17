@@ -308,19 +308,41 @@ public class UserMicroserviceApplicationTests {
 	
 	
 	/**
-	 * Delete an not existing user (id = 2)
+	 * Delete an deleted user (id = 2)
 	 * 
 	 * Expected HTTP Header: 404 (No Found) 
 	 */
 	@Test
-	public void test09_deleteNotValidUser() {
-		logger.info("TEST> Delete an not existing user!");
+	public void test09_deleteDeletedUser() {
+		logger.info("TEST> Delete an deleted user!");
 
 		// build web call
 		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 
 		// call site
 		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/2/", HttpMethod.DELETE, 
+				entity, String.class);
+		
+		// test
+		int expectedHeader = 404;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+	}
+	
+	
+	/**
+	 * Delete a not existing user (id = 100)
+	 * 
+	 * Expected HTTP Header: 404 (No Found) 
+	 */
+	@Test
+	public void test10_deleteNotValidUser() {
+		logger.info("TEST> Delete a not existing user!");
+
+		// build web call
+		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/100/", HttpMethod.DELETE, 
 				entity, String.class);
 		
 		// test
@@ -335,7 +357,7 @@ public class UserMicroserviceApplicationTests {
 	 * Expected String representation: "forename":"update"
 	 */
 	@Test
-	public void test10_updateValidUser() {
+	public void test11_updateValidUser() {
 		logger.info("TEST> Update an existing user!");
 	
 		// update user values
@@ -375,7 +397,7 @@ public class UserMicroserviceApplicationTests {
 	 * Expected HTTP Header: 409 (Conflict)
 	 */
 	@Test
-	public void test11_updateDublicate() {
+	public void test12_updateDublicate() {
 		logger.info("TEST> Update an user with same values!");
 	
 		// set user
@@ -400,33 +422,63 @@ public class UserMicroserviceApplicationTests {
 		assertEquals(expectedHeader, response.getStatusCodeValue());
 	}
 	
-//	/**
-//	 * Update a not existing user (id = 100)
-//	 * 
-//	 * Expected HTTP Header: 404 (Not Found)
-//	 */
-//	@Test
-//	public void test12_updateNonExistingUser() {
-//		logger.info("TEST> Update a not existing user!");
-//	
-//		// set user
-//		User user = new User();
-//		user.setForename("test");
-//
-//		// set valid MediaType
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//	
-//		// build web call
-//		HttpEntity<User> entity = new HttpEntity<>(user, headers);
-//
-//		// call site
-//		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/100/", 
-//				HttpMethod.PUT, entity, String.class);
-//		
-//		// test
-//		int expectedHeader = 404;
-//		assertEquals(expectedHeader, response.getStatusCodeValue());
-//	}
+	/**
+	 * Update a deleted user (id = 2)
+	 * 
+	 * Expected HTTP Header: 404 (Not Found)
+	 */
+	@Test
+	public void test12_updateDeletedUser() {
+		logger.info("TEST> Update a deleted user!");
+	
+		// set user
+		User user = new User();
+		user.setForename("test");
+
+		// set valid MediaType
+		headers.setContentType(MediaType.APPLICATION_JSON);
+	
+		// build web call
+		HttpEntity<User> entity = new HttpEntity<>(user, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/2/", 
+				HttpMethod.PUT, entity, String.class);
+		
+		// test
+		int expectedHeader = 404;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+	}
+	
+	
+	/**
+	 * Update a not existing user (id = 100)
+	 * 
+	 * Expected HTTP Header: 404 (Not Found)
+	 */
+	@Test
+	public void test12_updateNonExistingUser() {
+		logger.info("TEST> Update a not existing user!");
+	
+		// set user
+		User user = new User();
+		user.setForename("test");
+
+		// set valid MediaType
+		headers.setContentType(MediaType.APPLICATION_JSON);
+	
+		// build web call
+		HttpEntity<User> entity = new HttpEntity<>(user, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/100/", 
+				HttpMethod.PUT, entity, String.class);
+		
+		// test
+		int expectedHeader = 404;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+	}
+	
 	
 	private String localhostLink() {
 		return "http://localhost:" + port + "/users/";
