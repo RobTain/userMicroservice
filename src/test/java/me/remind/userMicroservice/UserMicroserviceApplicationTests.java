@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import me.remind.userMicroservice.model.User;
 
 /**
@@ -29,6 +30,7 @@ import me.remind.userMicroservice.model.User;
  * 
  * @author Robert Koenig
  */
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserMicroserviceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -101,11 +103,6 @@ public class UserMicroserviceApplicationTests {
 		// test
 		int expectedHeader = 201;
 		assertEquals(expectedHeader, response.getStatusCodeValue());
-
-		// check String representation
-		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
-
-		// test
 		String expectedStringRepresentation = "\"forename\":\"" + user.getForename() + "\",\"surname\":\""
 				+ user.getSurname() + "\",\"position\":\"" + user.getPosition() + "\",\"link\":\"" + user.getLink();
 		assertThat(response.getBody()).contains(expectedStringRepresentation);
@@ -214,13 +211,9 @@ public class UserMicroserviceApplicationTests {
 		// test
 		int expectedHeader = 201;
 		assertEquals(expectedHeader, response.getStatusCodeValue());
-
-		// check String representation
-		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
-
-		// test
 		String expectedStringRepresentation = "\"forename\":\"" + user.getForename() + "\",\"surname\":\""
-				+ user.getSurname() + "\",\"position\":\"" + user.getPosition() + "\",\"link\":\"" + user.getLink();
+				+ user.getSurname() + "\",\"position\":" + user.getPosition() + ",\"link\":" + user.getLink();
+		
 		assertThat(response.getBody()).contains(expectedStringRepresentation);
 	}
 
@@ -234,10 +227,17 @@ public class UserMicroserviceApplicationTests {
 	@Test
 	public void test07_createMultipleUsers() {
 		logger.info("TEST> Create multiple users!");
+		
+		// build web call
+		HttpEntity<String> ete = new HttpEntity<String>(null, headers);
+		
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.GET, ete, String.class);
+		
 		// create user
 		User user = new User();
 		user.setForename("Simon");
-		user.setSurname("Güll");
+		user.setSurname("Guell");
 		user.setPosition("Java Developer");
 		user.setLink("https://github.com/Vadammt");
 
@@ -245,7 +245,7 @@ public class UserMicroserviceApplicationTests {
 		HttpEntity<User> entity = new HttpEntity<>(user, headers);
 
 		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.POST, entity, String.class);
+		 response = restTemplate.exchange(localhostLink(), HttpMethod.POST, entity, String.class);
 
 		// check String representation
 		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
@@ -313,8 +313,7 @@ public class UserMicroserviceApplicationTests {
 
 		// build web call
 		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-
-		// call site
+		
 		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/2/", HttpMethod.DELETE, 
 				entity, String.class);
 		
@@ -354,13 +353,12 @@ public class UserMicroserviceApplicationTests {
 	@Test
 	public void test11_updateValidUser() {
 		logger.info("TEST> Update an existing user!");
-	
+		
 		// update user values
 		String updateVariable = "update";
 		
 		User user = new User();
-		user.setForename(updateVariable);
-		user.setLink(updateVariable);
+		user.setForename(updateVariable);		
 		
 		// set valid MediaType
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -371,16 +369,10 @@ public class UserMicroserviceApplicationTests {
 		// call site
 		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/", 
 				HttpMethod.PUT, entity, String.class);
-		
+	
 		// test
 		int expectedHeader = 200;
 		assertEquals(expectedHeader, response.getStatusCodeValue());
-		
-		// check string representation
-		response = restTemplate.exchange(localhostLink() + "/1/", HttpMethod.GET, 
-					entity, String.class);
-		
-		// test
 		String expectedStringRepresentation = "\"forename\":\"" + updateVariable;
 		assertThat(response.getBody()).contains(expectedStringRepresentation);		
 	}
@@ -474,6 +466,56 @@ public class UserMicroserviceApplicationTests {
 		assertEquals(expectedHeader, response.getStatusCodeValue());
 	}
 	
+		
+	/**
+	 * Check external Github information from a not existing user
+	 * 
+	 * Expected HTTP Header: 404 (No Content) 
+	 */
+	@Test
+	public void test15_getGitHubInformationFromNotValidUser() {
+		logger.info("TEST> Check external Github information from a not existing user!");
+
+		// build web call
+		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/100/repositories", 
+				HttpMethod.GET, entity, String.class);
+
+		// tests
+		int expectedHeader = 404;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+	}
+	
+	/**
+	 * Check external Github information from an existing user
+	 * 
+	 * Expected HTTP Header: 200 (OK) 
+	 * Expected String representation: contains(this.Application.name)
+	 */
+	@Test
+	public void test16_getGitHubInformationFromValidUser() {
+		logger.info("TEST> Check external Github information from an existing user!");
+		
+		
+		
+		// build web call
+		HttpEntity<User> entity = new HttpEntity<>(null, headers);
+		
+		// get external information
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/repositories" , 
+				HttpMethod.GET, entity, String.class);
+
+		System.out.println(response.getBody());
+		// tests
+		int expectedHeader = 200;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+		
+		String expectedStringRepresentation = "userMicroservice";
+		assertThat(response.getBody()).contains(expectedStringRepresentation);		
+	}
+	
 	
 	/**
 	 * Delete existing user (Max Mustermann with id = 2)
@@ -482,7 +524,7 @@ public class UserMicroserviceApplicationTests {
 	 * Expected String representation: []
 	 */
 	@Test
-	public void test15_deleteAllUser() {
+	public void test17_deleteAllUser() {
 		logger.info("TEST> Delete all user!");
 
 		// build web call
@@ -504,63 +546,8 @@ public class UserMicroserviceApplicationTests {
 		assertThat(!response.getBody().contains(expectedStringRepresentation));
 	}
 	
-	/**
-	 * Check external Github information from a not existing user
-	 * 
-	 * Expected HTTP Header: 404 (No Content) 
-	 */
-	@Test
-	public void test16_getGitHubInformationFromNotValidUser() {
-		logger.info("TEST> Check external Github information from a not existing user!");
-
-		// build web call
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/repositories", 
-				HttpMethod.GET, entity, String.class);
-
-		// tests
-		int expectedHeader = 404;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-	}
-	
-	/**
-	 * Check external Github information from an existing user
-	 * 
-	 * Expected HTTP Header: 200 (OK) 
-	 * Expected String representation: contains(this.Application.name)
-	 */
-	@Test
-	public void test17_getGitHubInformationFromValidUser() {
-		logger.info("TEST> Check external Github information from an existing user!");
-		
-		// create user
-		User user = new User();
-		user.setForename("Robert");
-		user.setSurname("Koenig");
-		user.setPosition("Java Developer");
-		user.setLink("https://github.com/RobTain");
-
-		// build web call
-		HttpEntity<User> entity = new HttpEntity<>(user, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.POST, entity, String.class);
-		
-		// call external site
-		response = restTemplate.exchange(localhostLink() + "/5/repositories" , HttpMethod.GET, entity, String.class);
-
-		// tests
-		int expectedHeader = 200;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-		
-		String expectedStringRepresentation = "userMicroservice";
-		assertThat(response.getBody()).contains(expectedStringRepresentation);		
-	}
 	
 	private String localhostLink() {
 		return "http://localhost:" + port + "/users/";
 	}
-
 }
