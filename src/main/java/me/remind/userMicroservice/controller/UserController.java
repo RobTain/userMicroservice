@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import me.remind.userMicroservice.impl.GithubServiceImpl;
 import me.remind.userMicroservice.model.User;
+import me.remind.userMicroservice.service.GithubServiceImpl;
 import me.remind.userMicroservice.service.UserService;
 
 import java.util.List;
@@ -31,7 +31,6 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-	
 	private GithubServiceImpl githubService = new GithubServiceImpl();
 	
 		
