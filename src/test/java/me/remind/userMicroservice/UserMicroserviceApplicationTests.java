@@ -29,6 +29,7 @@ import me.remind.userMicroservice.model.User;
  * 
  * @author Robert Koenig
  */
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserMicroserviceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -101,11 +102,6 @@ public class UserMicroserviceApplicationTests {
 		// test
 		int expectedHeader = 201;
 		assertEquals(expectedHeader, response.getStatusCodeValue());
-
-		// check String representation
-		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
-
-		// test
 		String expectedStringRepresentation = "\"forename\":\"" + user.getForename() + "\",\"surname\":\""
 				+ user.getSurname() + "\",\"position\":\"" + user.getPosition() + "\",\"link\":\"" + user.getLink();
 		assertThat(response.getBody()).contains(expectedStringRepresentation);
@@ -214,13 +210,9 @@ public class UserMicroserviceApplicationTests {
 		// test
 		int expectedHeader = 201;
 		assertEquals(expectedHeader, response.getStatusCodeValue());
-
-		// check String representation
-		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
-
-		// test
 		String expectedStringRepresentation = "\"forename\":\"" + user.getForename() + "\",\"surname\":\""
-				+ user.getSurname() + "\",\"position\":\"" + user.getPosition() + "\",\"link\":\"" + user.getLink();
+				+ user.getSurname() + "\",\"position\":" + user.getPosition() + ",\"link\":" + user.getLink();
+		
 		assertThat(response.getBody()).contains(expectedStringRepresentation);
 	}
 
@@ -234,10 +226,17 @@ public class UserMicroserviceApplicationTests {
 	@Test
 	public void test07_createMultipleUsers() {
 		logger.info("TEST> Create multiple users!");
+		
+		// build web call
+		HttpEntity<String> ete = new HttpEntity<String>(null, headers);
+		
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.GET, ete, String.class);
+		
 		// create user
 		User user = new User();
 		user.setForename("Simon");
-		user.setSurname("Güll");
+		user.setSurname("Guell");
 		user.setPosition("Java Developer");
 		user.setLink("https://github.com/Vadammt");
 
@@ -245,7 +244,7 @@ public class UserMicroserviceApplicationTests {
 		HttpEntity<User> entity = new HttpEntity<>(user, headers);
 
 		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.POST, entity, String.class);
+		 response = restTemplate.exchange(localhostLink(), HttpMethod.POST, entity, String.class);
 
 		// check String representation
 		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
@@ -313,8 +312,7 @@ public class UserMicroserviceApplicationTests {
 
 		// build web call
 		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-
-		// call site
+		
 		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/2/", HttpMethod.DELETE, 
 				entity, String.class);
 		
@@ -345,222 +343,166 @@ public class UserMicroserviceApplicationTests {
 		assertEquals(expectedHeader, response.getStatusCodeValue());
 	}
 	
-	/**
-	 * Update an existing user (id = 1)
-	 * 
-	 * Expected HTTP Header: 404 (No Found)
-	 * Expected String representation: "forename":"update"
-	 */
-	@Test
-	public void test11_updateValidUser() {
-		logger.info("TEST> Update an existing user!");
-	
-		// update user values
-		String updateVariable = "update";
-		
-		User user = new User();
-		user.setForename(updateVariable);
-		user.setLink(updateVariable);
-		
-		// set valid MediaType
-		headers.setContentType(MediaType.APPLICATION_JSON);
-	
-		// build web call
-		HttpEntity<User> entity = new HttpEntity<>(user, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/", 
-				HttpMethod.PUT, entity, String.class);
-		
-		// test
-		int expectedHeader = 200;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-		
-		// check string representation
-		response = restTemplate.exchange(localhostLink() + "/1/", HttpMethod.GET, 
-					entity, String.class);
-		
-		// test
-		String expectedStringRepresentation = "\"forename\":\"" + updateVariable;
-		assertThat(response.getBody()).contains(expectedStringRepresentation);		
-	}
-	
-	
-	/**
-	 * Update an existing user with same values (id = 3)
-	 * 
-	 * Expected HTTP Header: 409 (Conflict)
-	 */
-	@Test
-	public void test12_updateDublicate() {
-		logger.info("TEST> Update an user with same values!");
-	
-		// set user
-		User user = new User();
-		user.setForename("Simon");
-		user.setSurname("Güll");
-		user.setPosition("Java Developer");
-		user.setLink("https://github.com/Vadammt");
-		
-		// set valid MediaType
-		headers.setContentType(MediaType.APPLICATION_JSON);
-	
-		// build web call
-		HttpEntity<User> entity = new HttpEntity<>(user, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/", 
-				HttpMethod.PUT, entity, String.class);
-		
-		// test
-		int expectedHeader = 409;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-	}
-	
-	/**
-	 * Update a deleted user (id = 2)
-	 * 
-	 * Expected HTTP Header: 404 (Not Found)
-	 */
-	@Test
-	public void test13_updateDeletedUser() {
-		logger.info("TEST> Update a deleted user!");
-	
-		// set user
-		User user = new User();
-		user.setForename("test");
-
-		// set valid MediaType
-		headers.setContentType(MediaType.APPLICATION_JSON);
-	
-		// build web call
-		HttpEntity<User> entity = new HttpEntity<>(user, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/2/", 
-				HttpMethod.PUT, entity, String.class);
-		
-		// test
-		int expectedHeader = 404;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-	}
-	
-	
-	/**
-	 * Update a not existing user (id = 100)
-	 * 
-	 * Expected HTTP Header: 404 (Not Found)
-	 */
-	@Test
-	public void test14_updateNonExistingUser() {
-		logger.info("TEST> Update a not existing user!");
-	
-		// set user
-		User user = new User();
-		user.setForename("test");
-
-		// set valid MediaType
-		headers.setContentType(MediaType.APPLICATION_JSON);
-	
-		// build web call
-		HttpEntity<User> entity = new HttpEntity<>(user, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/100/", 
-				HttpMethod.PUT, entity, String.class);
-		
-		// test
-		int expectedHeader = 404;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-	}
-	
-	
-	/**
-	 * Delete existing user (Max Mustermann with id = 2)
-	 * 
-	 * Expected HTTP Header: 204 (No Content) 
-	 * Expected String representation: []
-	 */
-	@Test
-	public void test15_deleteAllUser() {
-		logger.info("TEST> Delete all user!");
-
-		// build web call
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.DELETE, 
-				entity, String.class);
-		
-		// test
-		int expectedHeader = 204;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-
-		// check String representation
-		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
-		
-		// test
-		String expectedStringRepresentation = "[]";
-		assertThat(!response.getBody().contains(expectedStringRepresentation));
-	}
-	
-	/**
-	 * Check external Github information from a not existing user
-	 * 
-	 * Expected HTTP Header: 404 (No Content) 
-	 */
-	@Test
-	public void test16_getGitHubInformationFromNotValidUser() {
-		logger.info("TEST> Check external Github information from a not existing user!");
-
-		// build web call
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/repositories", 
-				HttpMethod.GET, entity, String.class);
-
-		// tests
-		int expectedHeader = 404;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-	}
-	
-	/**
-	 * Check external Github information from an existing user
-	 * 
-	 * Expected HTTP Header: 200 (OK) 
-	 * Expected String representation: contains(this.Application.name)
-	 */
-	@Test
-	public void test17_getGitHubInformationFromValidUser() {
-		logger.info("TEST> Check external Github information from an existing user!");
-		
-		// create user
-		User user = new User();
-		user.setForename("Robert");
-		user.setSurname("Koenig");
-		user.setPosition("Java Developer");
-		user.setLink("https://github.com/RobTain");
-
-		// build web call
-		HttpEntity<User> entity = new HttpEntity<>(user, headers);
-
-		// call site
-		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.POST, entity, String.class);
-		
-		// call external site
-		response = restTemplate.exchange(localhostLink() + "/5/repositories" , HttpMethod.GET, entity, String.class);
-
-		// tests
-		int expectedHeader = 200;
-		assertEquals(expectedHeader, response.getStatusCodeValue());
-		
-		String expectedStringRepresentation = "userMicroservice";
-		assertThat(response.getBody()).contains(expectedStringRepresentation);		
-	}
+//	/**
+//	 * Update an existing user (id = 1)
+//	 * 
+//	 * Expected HTTP Header: 404 (No Found)
+//	 * Expected String representation: "forename":"update"
+//	 */
+//	@Test
+//	public void test11_updateValidUser() {
+//		logger.info("TEST> Update an existing user!");
+//	
+//		// update user values
+//		String updateVariable = "update";
+//		
+//		User user = new User();
+//		user.setForename(updateVariable);
+//		user.setLink(updateVariable);
+//		
+//		// set valid MediaType
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//	
+//		// build web call
+//		HttpEntity<User> entity = new HttpEntity<>(user, headers);
+//
+//		// call site
+//		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/", 
+//				HttpMethod.PUT, entity, String.class);
+//		
+//		// test
+//		int expectedHeader = 200;
+//		assertEquals(expectedHeader, response.getStatusCodeValue());
+//		
+//		// check string representation
+//		response = restTemplate.exchange(localhostLink() + "/1/", HttpMethod.GET, 
+//					entity, String.class);
+//		
+//		// test
+//		String expectedStringRepresentation = "\"forename\":\"" + updateVariable;
+//		assertThat(response.getBody()).contains(expectedStringRepresentation);		
+//	}
+//	
+//	
+//	/**
+//	 * Update an existing user with same values (id = 3)
+//	 * 
+//	 * Expected HTTP Header: 409 (Conflict)
+//	 */
+//	@Test
+//	public void test12_updateDublicate() {
+//		logger.info("TEST> Update an user with same values!");
+//	
+//		// set user
+//		User user = new User();
+//		user.setForename("Simon");
+//		user.setSurname("Güll");
+//		user.setPosition("Java Developer");
+//		user.setLink("https://github.com/Vadammt");
+//		
+//		// set valid MediaType
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//	
+//		// build web call
+//		HttpEntity<User> entity = new HttpEntity<>(user, headers);
+//
+//		// call site
+//		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/", 
+//				HttpMethod.PUT, entity, String.class);
+//		
+//		// test
+//		int expectedHeader = 409;
+//		assertEquals(expectedHeader, response.getStatusCodeValue());
+//	}
+//	
+//	/**
+//	 * Update a deleted user (id = 2)
+//	 * 
+//	 * Expected HTTP Header: 404 (Not Found)
+//	 */
+//	@Test
+//	public void test13_updateDeletedUser() {
+//		logger.info("TEST> Update a deleted user!");
+//	
+//		// set user
+//		User user = new User();
+//		user.setForename("test");
+//
+//		// set valid MediaType
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//	
+//		// build web call
+//		HttpEntity<User> entity = new HttpEntity<>(user, headers);
+//
+//		// call site
+//		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/2/", 
+//				HttpMethod.PUT, entity, String.class);
+//		
+//		// test
+//		int expectedHeader = 404;
+//		assertEquals(expectedHeader, response.getStatusCodeValue());
+//	}
+//	
+//	
+//	/**
+//	 * Update a not existing user (id = 100)
+//	 * 
+//	 * Expected HTTP Header: 404 (Not Found)
+//	 */
+//	@Test
+//	public void test14_updateNonExistingUser() {
+//		logger.info("TEST> Update a not existing user!");
+//	
+//		// set user
+//		User user = new User();
+//		user.setForename("test");
+//
+//		// set valid MediaType
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//	
+//		// build web call
+//		HttpEntity<User> entity = new HttpEntity<>(user, headers);
+//
+//		// call site
+//		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/100/", 
+//				HttpMethod.PUT, entity, String.class);
+//		
+//		// test
+//		int expectedHeader = 404;
+//		assertEquals(expectedHeader, response.getStatusCodeValue());
+//	}
+//	
+//	
+//	/**
+//	 * Delete existing user (Max Mustermann with id = 2)
+//	 * 
+//	 * Expected HTTP Header: 204 (No Content) 
+//	 * Expected String representation: []
+//	 */
+//	@Test
+//	public void test15_deleteAllUser() {
+//		logger.info("TEST> Delete all user!");
+//
+//		// build web call
+//		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+//
+//		// call site
+//		ResponseEntity<String> response = restTemplate.exchange(localhostLink(), HttpMethod.DELETE, 
+//				entity, String.class);
+//		
+//		// test
+//		int expectedHeader = 204;
+//		assertEquals(expectedHeader, response.getStatusCodeValue());
+//
+//		// check String representation
+//		response = restTemplate.exchange(localhostLink(), HttpMethod.GET, entity, String.class);
+//		
+//		// test
+//		String expectedStringRepresentation = "[]";
+//		assertThat(!response.getBody().contains(expectedStringRepresentation));
+//	}
 	
 	private String localhostLink() {
 		return "http://localhost:" + port + "/users/";
 	}
-
 }

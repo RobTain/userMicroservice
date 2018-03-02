@@ -5,22 +5,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Entity
-@Table(name = "USER")
 public class User {
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	private Long id;
-	@Column(name = "FORENAME")
 	private String forename;
-	@Column(name = "SURNAME")
+
 	private String surname;
-	@Column(name = "POSITION")
 	private String position;
-	@Column(name = "LINK", unique = true)
+	@Column(unique = true)
 	private String link;
 
 	public Long getId() {
@@ -66,14 +62,17 @@ public class User {
 	public boolean equals(User user) {
 		boolean equals = false;
 		// check unique link
-		if (this.getLink().equals(user.getLink()) && this.getLink() != null) {
-			equals = true;
-		} else {
-			// same user? -> only if all user.values equal
-			if (this.getForename().equals(user.getForename()) && this.getSurname().equals(user.getSurname())
-					&& this.getPosition().equals(user.getPosition())) {
+		if (this.getLink() != null && user.getLink() != null) {
+			if (this.getLink().equals(user.getLink())) {
 				equals = true;
 			}
+		}
+		
+		// same user? -> only if all user.values equal
+		if (this.getForename().equals(user.getForename()) && this.getSurname().equals(user.getSurname())
+				&& this.getPosition().equals(user.getPosition())) {
+			equals = true;
+
 		}
 		return equals;
 	}
