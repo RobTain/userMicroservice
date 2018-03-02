@@ -9,8 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class UserMicroserviceApplication {
 
 /*
- * TODO: Github Service bauen -> Für jede Entity mit Aufgabe gibt es einen eigenen Service (mit Auth2)
- * TODO: Tests nicht nach Reihenfolge, sondern abgeschlossen 
+ * TODO: Github Service (mit Auth2)
  */
 
 	public static void main(String[] args) {
