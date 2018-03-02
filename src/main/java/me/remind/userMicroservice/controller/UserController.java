@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.remind.userMicroservice.impl.GithubServiceImpl;
 import me.remind.userMicroservice.model.User;
-import me.remind.userMicroservice.service.GithubService;
 import me.remind.userMicroservice.service.UserService;
 
 import java.util.List;
