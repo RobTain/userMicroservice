@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import me.remind.userMicroservice.model.User;
 
 /**
@@ -465,6 +466,56 @@ public class UserMicroserviceApplicationTests {
 		assertEquals(expectedHeader, response.getStatusCodeValue());
 	}
 	
+		
+	/**
+	 * Check external Github information from a not existing user
+	 * 
+	 * Expected HTTP Header: 404 (No Content) 
+	 */
+	@Test
+	public void test15_getGitHubInformationFromNotValidUser() {
+		logger.info("TEST> Check external Github information from a not existing user!");
+
+		// build web call
+		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+
+		// call site
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/100/repositories", 
+				HttpMethod.GET, entity, String.class);
+
+		// tests
+		int expectedHeader = 404;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+	}
+	
+	/**
+	 * Check external Github information from an existing user
+	 * 
+	 * Expected HTTP Header: 200 (OK) 
+	 * Expected String representation: contains(this.Application.name)
+	 */
+	@Test
+	public void test16_getGitHubInformationFromValidUser() {
+		logger.info("TEST> Check external Github information from an existing user!");
+		
+		
+		
+		// build web call
+		HttpEntity<User> entity = new HttpEntity<>(null, headers);
+		
+		// get external information
+		ResponseEntity<String> response = restTemplate.exchange(localhostLink() + "/1/repositories" , 
+				HttpMethod.GET, entity, String.class);
+
+		System.out.println(response.getBody());
+		// tests
+		int expectedHeader = 200;
+		assertEquals(expectedHeader, response.getStatusCodeValue());
+		
+		String expectedStringRepresentation = "userMicroservice";
+		assertThat(response.getBody()).contains(expectedStringRepresentation);		
+	}
+	
 	
 	/**
 	 * Delete existing user (Max Mustermann with id = 2)
@@ -473,7 +524,7 @@ public class UserMicroserviceApplicationTests {
 	 * Expected String representation: []
 	 */
 	@Test
-	public void test15_deleteAllUser() {
+	public void test17_deleteAllUser() {
 		logger.info("TEST> Delete all user!");
 
 		// build web call
@@ -494,6 +545,7 @@ public class UserMicroserviceApplicationTests {
 		String expectedStringRepresentation = "[]";
 		assertThat(!response.getBody().contains(expectedStringRepresentation));
 	}
+	
 	
 	private String localhostLink() {
 		return "http://localhost:" + port + "/users/";

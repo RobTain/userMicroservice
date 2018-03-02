@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import me.remind.userMicroservice.impl.GithubServiceImpl;
 import me.remind.userMicroservice.model.User;
+import me.remind.userMicroservice.service.GithubService;
 import me.remind.userMicroservice.service.UserService;
 
 import java.util.List;
@@ -29,7 +32,10 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-
+	
+	private GithubServiceImpl githubService = new GithubServiceImpl();
+	
+		
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
@@ -136,7 +142,7 @@ public class UserController {
 		if (userService.findOne(id) == null) {
 			logger.info("Unable to update user with id {} -> ID not found", id);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		} else {			
+		} else {
 			if (userExist(user)) {
 				logger.error("Unable to update user. User already exist!");
 				return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -149,37 +155,36 @@ public class UserController {
 		}
 	}
 
-	// /**
-	// * List Github-Repositories and coding language from a certain user:
-	// *
-	// * @param id the id to be searched for
-	// * @return external informations from user id or an HTTP 404
-	// */
-	// @RequestMapping(value = "/users/{id}/repositories", method =
-	// RequestMethod.GET)
-	// public ResponseEntity<String> findRepositoriesFromUserId(@PathVariable("id")
-	// Long id) {
-	//
-	// // fetch certain user
-	// User user = userService.findUserById(id);
-	//
-	// // check not existing user
-	// if (user == null) {
-	// logger.error("User with id {} not found", id);
-	// return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	// } else {
-	// // find external input
-	// String list = userService.findExternalResources(user.getLink());
-	//
-	// // check for a filled list (prevent HTTP 404)
-	// if (!list.equals("")) {
-	// return new ResponseEntity<String>(list, HttpStatus.OK);
-	// } else {
-	// logger.error("HTTP 404: Check Link!");
-	// return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	// }
-	// }
-	// }
+	/**
+	 * List Github-Repositories and coding language from a certain user:
+	 *
+	 * @param id
+	 *            the id to be searched for
+	 * @return external informations from user id or an HTTP 404
+	 */
+	@RequestMapping(value = "/users/{id}/repositories", method = RequestMethod.GET)
+	public ResponseEntity<String> findRepositoriesFromUserId(@PathVariable("id") Long id) {
+
+		// fetch certain user
+		User user = userService.findOne(id);
+
+		// check not existing user
+		if (user == null) {
+			logger.error("User with id {} not found", id);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			// find external input
+			String list = githubService.findExternalResources(user.getLink());
+
+			// check for a filled list (prevent HTTP 404)
+			if (!list.equals("")) {
+				return new ResponseEntity<String>(list, HttpStatus.OK);
+			} else {
+				logger.error("HTTP 404: Check Link!");
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}
+	}
 
 	private boolean userExist(User user) {
 		boolean userExist = false;
