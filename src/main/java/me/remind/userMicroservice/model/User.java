@@ -59,18 +59,25 @@ public class User {
 		this.link = link;
 	}
 
+	
+	
+	
 	public boolean equals(User user) {
 		boolean equals = false;
 		// check unique link
 		if (this.getLink() != null && user.getLink() != null) {
 			if (this.getLink().equals(user.getLink())) {
+				System.out.println("das erste");
 				equals = true;
 			}
 		}
 		
+		
+		
 		// same user? -> only if all user.values equal
 		if (this.getForename().equals(user.getForename()) && this.getSurname().equals(user.getSurname())
 				&& this.getPosition().equals(user.getPosition())) {
+			System.out.println("das zweite");
 			equals = true;
 
 		}
