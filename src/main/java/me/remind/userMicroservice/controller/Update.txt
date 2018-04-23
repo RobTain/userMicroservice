@@ -40,14 +40,9 @@ public class UserController {
 	
 	@PutMapping(value = "/users/{id}")
 	public ResponseEntity<User> editUser(@PathVariable("id") Long id, @RequestBody User user) {
-		Product temp = productService.findById(id).get();
-		temp.setName(product.getName());
-		temp.setPhoto(product.getPhoto());
-		temp.setDescription(product.getDescription());
-		temp.setFeatured(product.getFeatured());
-		temp.setPrice(product.getPrice());
-		temp.setQuantity(product.getQuantity());
-		return new ResponseEntity<Product>(productService.save(temp), HttpStatus.OK);
+		User us = userService.findById(id).get();
+		// set new values
+		return new ResponseEntity<User>(userService.save(us), HttpStatus.OK);
 
 	}
 	
