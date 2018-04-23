@@ -9,3 +9,10 @@ Update (CrudRepository was changed)
 	public ResponseEntity<Optional<User>> findOne(@PathVariable("id") Long id) {
 		return new ResponseEntity<Optional<User>>(userService.findById(id), HttpStatus.FOUND);
 	}
+
+	@RequestMapping(value = {"/users", "/users/"}, method = RequestMethod.DELETE)
+	public HttpStatus deleteAll() {
+		userService.deleteAll();
+		return HttpStatus.OK;
+	}
+	
