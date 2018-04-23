@@ -1,1 +1,11 @@
-Update (CrudRepository 
+Update (CrudRepository was changed)
+
+@RequestMapping(value = { "/users", "/users/" }, method = RequestMethod.GET)
+	public ResponseEntity<Iterable<User>> findAll() {
+		return new ResponseEntity<Iterable<User>>(userService.findAll(), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+	public ResponseEntity<Optional<User>> findOne(@PathVariable("id") Long id) {
+		return new ResponseEntity<Optional<User>>(userService.findById(id), HttpStatus.FOUND);
+	}
