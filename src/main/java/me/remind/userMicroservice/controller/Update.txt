@@ -1,6 +1,6 @@
 Update (CrudRepository was changed)
 
-@RequestMapping(value = { "/users", "/users/" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/users", "/users/" }, method = RequestMethod.GET)
 	public ResponseEntity<Iterable<User>> findAll() {
 		return new ResponseEntity<Iterable<User>>(userService.findAll(), HttpStatus.OK);
 	}
