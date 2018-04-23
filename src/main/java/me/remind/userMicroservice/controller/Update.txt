@@ -16,3 +16,13 @@ Update (CrudRepository was changed)
 		return HttpStatus.OK;
 	}
 	
+
+	@RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
+	public HttpStatus deleteById(@PathVariable("id") Long id) {
+		if (userService.existsById(id)) {
+			userService.deleteById(id);
+			return HttpStatus.OK;
+		} else {
+			return HttpStatus.NO_CONTENT;
+		}
+	}
